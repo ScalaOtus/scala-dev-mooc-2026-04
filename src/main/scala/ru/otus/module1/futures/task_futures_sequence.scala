@@ -1,8 +1,11 @@
 package ru.otus.module1.futures
 
+import com.sun.net.httpserver.Authenticator.Failure
 import ru.otus.module1.futures.HomeworksUtils.task
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.util.{Failure, Success}
+import scala.util.Try
 
 object task_futures_sequence {
 
@@ -12,7 +15,7 @@ object task_futures_sequence {
    * возвращающую все успешные и не успешные результаты.
    * Возвращаемое тип функции - кортеж из двух списков,
    * в левом хранятся результаты успешных выполнений,
-   * в правовой результаты неуспешных выполнений.
+   * в правом результаты неуспешных выполнений.
    * Не допускается использование методов объекта Await и мутабельных переменных var
    */
   /**
@@ -21,6 +24,17 @@ object task_futures_sequence {
    */
   def fullSequence[A](futures: List[Future[A]])
                      (implicit ex: ExecutionContext): Future[(List[A], List[Throwable])] =
-    task"Реализуйте метод `fullSequence`" ()
+    futures.foldLeft(Future.successful((List.empty[A], List.empty[Throwable]))) {
+      (accF, nextF) => for {
+        case(s, f) <- accF
+        t <- toTry(nextF)
+      } yield t match {
+        case scala.util.Success(v) => (s :+ v, f)
+        case scala.util.Failure(e) => (s, f :+ e)
+      }
+    }
 
+  def toTry[A](f: Future[A])(implicit ec: ExecutionContext): Future[Try[A]] =
+    f.map(Success(_)).recover { case e => scala.util.Failure(e) }
 }
+
