@@ -1,4 +1,4 @@
-package module1.futures
+package ru.otus.module1.futures
 
 import org.scalatest.flatspec.AnyFlatSpec
 import ru.otus.module1.futures.task_futures_sequence
