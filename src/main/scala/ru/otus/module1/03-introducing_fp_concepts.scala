@@ -1,19 +1,17 @@
 package ru.otus.module1
-
-//import ru.otus.module1.variance.{Animal, Cat}
-
 import scala.language.postfixOps
 import scala.math.Fractional.Implicits.infixFractionalOps
 import scala.math.Numeric.Implicits.infixNumericOps
+import scala.annotation.tailrec
 
+//import ru.otus.module1.variance.{Animal, Cat}
 
 
 /**
  * referential transparency
  */
 
-
- // recursion
+// recursion
 
 object recursion {
   def main(args: Array[String]): Unit = {
@@ -38,6 +36,7 @@ object recursion {
 
 
     def factTailRec(n: Int): Int = {
+      @tailrec
       def loop(n: Int, accum: Int): Int =
         if (n <= 0) accum
         else loop(n - 1, n * accum)
@@ -118,8 +117,6 @@ object hof{
 
 object variance {
 
-  def main(args: Array[String]): Unit = {
-
     // Invariance Вне зависимости от отношений между типами A и B, Box[A] и Box[B] два разных типа
     // + Covariance Если А является подтипом В, то Box[A] является подтипом Box[B]
     // - Contravariance Если А является подтипом В, то Box[A] является супер типом Box[B]
@@ -143,22 +140,20 @@ object variance {
     val catFeeder: Feeder[Cat] = animalFeeder
     val dogFeeder: Feeder[Dog] = animalFeeder
 
-    catFeeder.feed(Cat("Syoma"))
-    dogFeeder.feed(Dog("Ray"))
-
     def feed(a: Animal): Unit =
       animalFeeder.feed(a)
 
-    feed(Cat("Nora"))
-    feed(Dog("Balu"))
-
+//    catFeeder.feed(Cat("Syoma"))
+//    dogFeeder.feed(Dog("Ray"))
+//
+//    feed(Cat("Nora"))
+//    feed(Dog("Balu"))
 
 //    trait Function1[-R, +T] = R => T
 
 //    val f1: Animal => Dog = ???
 //    val f2: Dog => Animal = f1
 
-  }
 }
 
 
@@ -172,14 +167,12 @@ object variance {
 
 
 
- object opt {
-
+object opt {
 
   /**
    *
    * Реализовать структуру данных Option, который будет указывать на присутствие либо отсутствие результата
    */
-
 
   sealed trait Option[+T] {
     def isEmpty: Boolean = if(this.isInstanceOf[None.type]) true else false
@@ -200,9 +193,6 @@ object variance {
 
 //  var animalOpt: Option[Animal] = None
 //  var intOpt: Option[Int] = ???
-
-
-
 
   /**
    *

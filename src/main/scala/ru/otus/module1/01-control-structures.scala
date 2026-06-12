@@ -9,7 +9,6 @@ object controlStructures {
      * for
      */
 
-
     /**
      *
      * Конструкция if / else имеет туже семантику, что и в других ЯП. В зависимости от условия,
@@ -27,8 +26,6 @@ object controlStructures {
     val cond: Boolean = true
 
     val x1: String = if cond then "yes" else "no"
-
-
 
 
     //2. Напишите выражение, но которое в зависимости от значения выражения cond
