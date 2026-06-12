@@ -4,15 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a47c6391-a1b8-43bd-9d8e-4554a25eadce" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/LanguageServersSettings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/scala_compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/scala_compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/scala_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/scala_settings.xml" afterDir="false" />
+    <list default="true" id="a47c6391-a1b8-43bd-9d8e-4554a25eadce" name="Changes" comment="Update">
+      <change afterPath="$PROJECT_DIR$/src/test/scala/ru/otus/module1/OptionSpec.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.sbt" beforeDir="false" afterPath="$PROJECT_DIR$/build.sbt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/ru/otus/module1/01-control-structures.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/ru/otus/module1/01-control-structures.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/ru/otus/module1/03-introducing_fp_concepts.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/ru/otus/module1/03-introducing_fp_concepts.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/scala/module1/CheckCollectionsTask.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/scala/ru/otus/module1/CheckCollectionsTask.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/scala/module1/ToyListSpec.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/scala/ru/otus/module1/ToyListSpec.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/scala/module1/futures/futures_sequence_test.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/scala/ru/otus/module1/futures/futures_sequence_test.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,6 +48,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "dekochnev"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/ScalaOtus/scala-dev-mooc-2026-04.git",
+    "accountId": "9b4a98b2-7ee3-467c-bfaa-7ca995fe7054"
+  }
+}]]></component>
   <component name="OpenIdeProjectLocalState">
     <option name="firstOpen" value="false" />
   </component>
@@ -78,54 +89,26 @@
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Scala REPL.Scala REPL.executor": "Run",
+    "ScalaTest.OptionSpec.executor": "Run",
+    "ScalaTest.OptionSpec.filter should оставить None без изменений.executor": "Run",
+    "ScalaTest.OptionSpec.flatMap should вызвать lookup для Some и вернуть его Option.executor": "Run",
+    "ScalaTest.OptionSpec.flatMap should превратить Some в None, если lookup вернул None.executor": "Run",
+    "ScalaTest.OptionSpec.getOrElse should вернуть значение из Some.executor": "Run",
+    "ScalaTest.OptionSpec.getOrElse should не вычислять дефолт при наличии значения (call-by-name).executor": "Run",
     "git-widget-placeholder": "dev",
     "kotlin-language-version-configured": "true",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
+    "project.structure.last.edited": "Libraries",
+    "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.433832",
     "settings.editor.selected.configurable": "preferences.pluginManager"
+  },
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "Scala"
+    ]
   }
 }]]></component>
-  <component name="RunManager" selected="Scala REPL.Scala REPL">
-    <configuration name="hof" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="ru.otus.module1.hof" />
-      <module name="scala-dev-mooc-2026-04.main" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="ru.otus.module1.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="recursion" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="ru.otus.module1.recursion" />
-      <module name="scala-dev-mooc-2026-04.main" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="ru.otus.module1.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="variance" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="ru.otus.module1.variance" />
-      <module name="scala-dev-mooc-2026-04.main" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="ru.otus.module1.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="ScalaTest.OptionSpec">
     <configuration default="true" type="JetRunConfigurationType">
       <module name="scala-dev-course_771" />
       <method v="2">
@@ -160,21 +143,150 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="Scala REPL" type="ScalaScriptConsoleRunConfiguration" factoryName="Scala Console" temporary="true" show_console_on_std_err="false" show_console_on_std_out="false">
-      <module name="scala-dev-mooc-2026-04.main" />
+    <configuration name="OptionSpec" type="ScalaTestRunConfiguration" factoryName="ScalaTest" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+      <module name="scala-dev-mooc-2026-04.test" />
+      <option name="VMParameters" value="" />
       <option name="allowRunningInParallel" value="false" />
+      <option name="alternativeJrePath" />
+      <option name="alternativeJrePathEnabled" value="false" />
+      <option name="classpathModifications">
+        <list />
+      </option>
       <option name="envFilePaths">
         <list />
       </option>
-      <option name="environmentVariables">
+      <option name="envs">
         <map />
       </option>
-      <option name="javaOptions" value="" />
-      <option name="myConsoleArgs" value="" />
+      <option name="passParentEnvs" value="true" />
+      <option name="programParameters" value="" />
       <option name="projectPathOnTarget" />
       <option name="selectedOptions">
         <list />
       </option>
+      <option name="testKind" value="Class" />
+      <option name="workingDirectory" value="$PROJECT_DIR$" />
+      <option name="testClassPath" value="ru.otus.module1.OptionSpec" />
+      <option name="workingDirectory" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="OptionSpec.filter should оставить None без изменений" type="ScalaTestRunConfiguration" factoryName="ScalaTest" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+      <module name="scala-dev-mooc-2026-04.test" />
+      <option name="VMParameters" value="" />
+      <option name="allowRunningInParallel" value="false" />
+      <option name="alternativeJrePath" />
+      <option name="alternativeJrePathEnabled" value="false" />
+      <option name="classpathModifications">
+        <list />
+      </option>
+      <option name="envFilePaths">
+        <list />
+      </option>
+      <option name="envs">
+        <map />
+      </option>
+      <option name="passParentEnvs" value="true" />
+      <option name="programParameters" value="" />
+      <option name="projectPathOnTarget" />
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <option name="testKind" value="Test name" />
+      <option name="workingDirectory" value="$PROJECT_DIR$" />
+      <option name="testClassPath" value="ru.otus.module1.OptionSpec" />
+      <option name="testName" value="filter should оставить None без изменений" />
+      <option name="workingDirectory" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="OptionSpec.flatMap should превратить Some в None, если lookup вернул None" type="ScalaTestRunConfiguration" factoryName="ScalaTest" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+      <module name="scala-dev-mooc-2026-04.test" />
+      <option name="VMParameters" value="" />
+      <option name="allowRunningInParallel" value="false" />
+      <option name="alternativeJrePath" />
+      <option name="alternativeJrePathEnabled" value="false" />
+      <option name="classpathModifications">
+        <list />
+      </option>
+      <option name="envFilePaths">
+        <list />
+      </option>
+      <option name="envs">
+        <map />
+      </option>
+      <option name="passParentEnvs" value="true" />
+      <option name="programParameters" value="" />
+      <option name="projectPathOnTarget" />
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <option name="testKind" value="Test name" />
+      <option name="workingDirectory" value="$PROJECT_DIR$" />
+      <option name="testClassPath" value="ru.otus.module1.OptionSpec" />
+      <option name="testName" value="flatMap should превратить Some в None, если lookup вернул None" />
+      <option name="workingDirectory" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="OptionSpec.flatMap should вызвать lookup для Some и вернуть его Option" type="ScalaTestRunConfiguration" factoryName="ScalaTest" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+      <module name="scala-dev-mooc-2026-04.test" />
+      <option name="VMParameters" value="" />
+      <option name="allowRunningInParallel" value="false" />
+      <option name="alternativeJrePath" />
+      <option name="alternativeJrePathEnabled" value="false" />
+      <option name="classpathModifications">
+        <list />
+      </option>
+      <option name="envFilePaths">
+        <list />
+      </option>
+      <option name="envs">
+        <map />
+      </option>
+      <option name="passParentEnvs" value="true" />
+      <option name="programParameters" value="" />
+      <option name="projectPathOnTarget" />
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <option name="testKind" value="Test name" />
+      <option name="workingDirectory" value="$PROJECT_DIR$" />
+      <option name="testClassPath" value="ru.otus.module1.OptionSpec" />
+      <option name="testName" value="flatMap should вызвать lookup для Some и вернуть его Option" />
+      <option name="workingDirectory" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="OptionSpec.getOrElse should не вычислять дефолт при наличии значения (call-by-name)" type="ScalaTestRunConfiguration" factoryName="ScalaTest" temporary="true" nameIsGenerated="true" show_console_on_std_err="false" show_console_on_std_out="false">
+      <module name="scala-dev-mooc-2026-04.test" />
+      <option name="VMParameters" value="" />
+      <option name="allowRunningInParallel" value="false" />
+      <option name="alternativeJrePath" />
+      <option name="alternativeJrePathEnabled" value="false" />
+      <option name="classpathModifications">
+        <list />
+      </option>
+      <option name="envFilePaths">
+        <list />
+      </option>
+      <option name="envs">
+        <map />
+      </option>
+      <option name="passParentEnvs" value="true" />
+      <option name="programParameters" value="" />
+      <option name="projectPathOnTarget" />
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <option name="testKind" value="Test name" />
+      <option name="workingDirectory" value="$PROJECT_DIR$" />
+      <option name="testClassPath" value="ru.otus.module1.OptionSpec" />
+      <option name="testName" value="getOrElse should не вычислять дефолт при наличии значения (call-by-name)" />
       <option name="workingDirectory" value="$PROJECT_DIR$" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -219,10 +331,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Scala REPL.Scala REPL" />
-        <item itemvalue="Application.hof" />
-        <item itemvalue="Application.variance" />
-        <item itemvalue="Application.recursion" />
+        <item itemvalue="ScalaTest.OptionSpec" />
+        <item itemvalue="ScalaTest.OptionSpec.filter should оставить None без изменений" />
+        <item itemvalue="ScalaTest.OptionSpec.flatMap should превратить Some в None, если lookup вернул None" />
+        <item itemvalue="ScalaTest.OptionSpec.flatMap should вызвать lookup для Some и вернуть его Option" />
+        <item itemvalue="ScalaTest.OptionSpec.getOrElse should не вычислять дефолт при наличии значения (call-by-name)" />
       </list>
     </recent_temporary>
   </component>
@@ -252,6 +365,19 @@
       <option name="presentableId" value="Default" />
       <updated>1781249027519</updated>
     </task>
+    <task id="LOCAL-00001" summary="Update">
+      <option name="closed" value="true" />
+      <created>1781274878256</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1781274878257</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Update" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update" />
   </component>
 </project>
