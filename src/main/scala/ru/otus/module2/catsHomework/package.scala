@@ -98,4 +98,4 @@ package object catsHomework {
      def ensure[A](fa: EitherString[A])(e: String)(f: A => Boolean): EitherString[A] = fa.filterOrElse(f,e)
   }
 
-  }
+}
