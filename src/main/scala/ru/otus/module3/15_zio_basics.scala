@@ -267,7 +267,8 @@ object zioOperators {
     * 
     * A as B
     */
-  
+
+  lazy val c = ???
 
 }
 
@@ -281,5 +282,5 @@ def run4() = {
 
 object MyApp extends ZIOAppDefault {
   val z = ZIO.attempt(println("Hello world"))
-  def run = z
+  def run = z.exit
 }
