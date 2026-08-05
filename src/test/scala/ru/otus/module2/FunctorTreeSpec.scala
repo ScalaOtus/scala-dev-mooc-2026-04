@@ -1,13 +1,15 @@
 package ru.otus.module2
 
 import cats.Functor
-import org.scalatest.OptionValues
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.OptionValues
 import ru.otus.module2.catsHomework.{Branch, Leaf, Tree}
+import ru.otus.module2.catsHomework.given
 
-class FunctorTreeSpec(using functor: Functor[Tree]) extends AnyFlatSpec with Matchers with OptionValues {
+class FunctorTreeSpec extends AnyFlatSpec with Matchers with OptionValues {
 
+  private val functor = summon[Functor[Tree]]
   private val emptyTree: Tree[Int] = Tree.empty
   private val singleLeaf: Tree[Int] = Tree.leaf(1)
   private val simpleTree: Tree[Int] =
@@ -37,7 +39,7 @@ class FunctorTreeSpec(using functor: Functor[Tree]) extends AnyFlatSpec with Mat
     result shouldBe Tree.leaf(2)
   }
 
-  it should "correctly transform complex tree" in {
+  it should "correctly transform tree" in {
     val result = functor.map(simpleTree)(_ * 2)
     result shouldBe
       Branch(
@@ -47,6 +49,58 @@ class FunctorTreeSpec(using functor: Functor[Tree]) extends AnyFlatSpec with Mat
           Leaf(6)
         )
       )
+  }
+
+  "map function" should "handle String type" in {
+    val stringTree = Branch(
+      Leaf("a"),
+      Branch(
+        Leaf("b"),
+        Leaf("c")
+      )
+    )
+
+    val result = functor.map(stringTree)(_.toUpperCase)
+    result shouldBe
+      Branch(
+        Leaf("A"),
+        Branch(
+          Leaf("B"),
+          Leaf("C")
+        )
+      )
+  }
+
+  it should "correctly handle complex transformations" in {
+    val result = functor.map(simpleTree)(x => (x * 2).toString + "x")
+    result shouldBe
+      Branch(
+        Leaf("2x"),
+        Branch(
+          Leaf("4x"),
+          Leaf("6x")
+        )
+      )
+  }
+
+  // Тесты законов функтора
+
+  "Functor laws" should "satisfy identity law" in {
+    // Закон идентичности: fu.map(fa)(identity) == fa
+    functor.map(simpleTree)(identity) shouldBe simpleTree
+    functor.map(singleLeaf)(identity) shouldBe singleLeaf
+    functor.map(emptyTree)(identity) shouldBe emptyTree
+  }
+
+  it should "satisfy composition law" in {
+    // Закон композиции: fu.map(fu.map(fa)(f))(g) == fu.map(fa)(f andThen g)
+    val f = (_: Int) * 2
+    val g = (_: Int) + 1
+
+    val leftSide = functor.map(functor.map(simpleTree)(f))(g)
+    val rightSide = functor.map(simpleTree)(f andThen g)
+
+    leftSide shouldBe rightSide
   }
 
 }
