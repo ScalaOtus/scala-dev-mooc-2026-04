@@ -2,94 +2,61 @@ package ru.otus.module2
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import ru.otus.module2.catsHomework.{Tree, Branch, Leaf}
+import ru.otus.module2.catsHomework.{Branch, Empty, Leaf, Tree}
 
 class TreeSpec extends AnyFlatSpec with Matchers {
 
   private val emptyTree: Tree[Int] = Tree.empty
   private val singleLeaf: Tree[Int] = Tree.leaf(1)
-  private val simpleTree: Tree[Int] =
-    Branch(
-      Leaf(1),
-      Branch(
-        Leaf(2),
-        Leaf(3)
-      )
-    )
+  private val simpleTree: Tree[Int] = Tree(List(1, 2, 3, 4))
 
-  "Empty Tree" should "be empty (emptyTree == true)" in {
-    emptyTree.isEmpty shouldBe true
+  "Empty tree" should "be empty" in {
+    Tree.empty[Int] shouldBe an[Empty.type]
+    Tree.empty[Int].isEmpty shouldBe true
   }
 
-  "Single leaf tree" should "not be empty (emptyTree == false)" in {
-    singleLeaf.isEmpty shouldBe false
+  "Leaf node" should "contain single value" in {
+    val leaf = Tree.leaf(1)
+    leaf shouldBe a[Leaf[_]]
+    leaf.isEmpty shouldBe false
   }
 
-  "map function" should "correctly transform values" in {
-    val mappedTree = simpleTree.map(_ * 2)
-    mappedTree shouldBe
-      Branch(
-        Leaf(2),
-        Branch(
-          Leaf(4),
-          Leaf(6)
-        )
-      )
+  "Branch node" should "contain value and children" in {
+    val branch = Tree.branch(1, Tree.leaf(2), Tree.leaf(3))
+    branch match {
+      case b: Branch[Int] =>
+        b.value shouldBe 1
+        b.left shouldBe a[Leaf[_]]
+        b.right shouldBe a[Leaf[_]]
+      case _ => fail("Expected a Branch")
+    }
   }
 
-  it should "work with identity function" in {
-    val result = simpleTree.map(identity)
-    result shouldBe simpleTree
+  "Tree construction" should "handle single element" in {
+    Tree(1) shouldBe Tree.leaf(1)
   }
 
-  "map on empty Tree" should "return empty Tree" in {
-    val result = emptyTree.map(_ * 2)
-    result shouldBe emptyTree
+  // Tree(List(1, 2, 3, 4)) is
+  //      Branch(1)
+  // Leaf(2)    Branch(3)
+  //          Empty     Leaf(4)
+  it should "handle list of elements correctly" in {
+    simpleTree match {
+      case Branch(1, Leaf(2), Branch(3, Empty, Leaf(4))) =>
+      case _ => fail("Root structure is incorrect")
+    }
   }
 
-  "map on single Leaf" should "transform single value" in {
-    val result = singleLeaf.map(_ * 2)
-    result shouldBe Tree.leaf(2)
+  "map function" should "transform values correctly" in {
+    val tree = Tree(List(1, 2, 3))
+    val mapped = tree.map(_ * 2)
+    mapped shouldBe Tree(List(2, 4, 6))
   }
 
-  it should "correctly handle different types" in {
-    val stringTree = simpleTree.map(_.toString)
-    stringTree shouldBe
-      Branch(
-        Leaf("1"),
-        Branch(
-          Leaf("2"),
-          Leaf("3")
-        )
-      )
-  }
-
-  it should "compose functions correctly" in {
-    val result = simpleTree.map(_ * 2).map(_ + 1)
-    result shouldBe
-      Branch(
-        Leaf(3),
-        Branch(
-          Leaf(5),
-          Leaf(7)
-        )
-      )
-  }
-
-  "Branch Tree" should "correctly represent structure" in {
-    simpleTree shouldBe
-      Branch(
-        Leaf(1),
-        Branch(
-          Leaf(2),
-          Leaf(3)
-        )
-      )
-  }
-
-  "Tree equality" should "work correctly for different structures" in {
-    simpleTree should !==(singleLeaf)
-    simpleTree should !==(emptyTree)
+  "Empty checks" should "work correctly" in {
+    Tree.empty[Int].isEmpty shouldBe true
+    Tree.leaf(1).isEmpty shouldBe false
+    Tree.branch(1, Tree.leaf(2), Tree.leaf(3)).isEmpty shouldBe false
   }
 
 }

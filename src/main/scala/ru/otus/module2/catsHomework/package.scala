@@ -1,7 +1,6 @@
 package ru.otus.module2
 
 import cats.Functor
-//import cats.syntax.functor._
 import catsHomework.{Branch, Empty, Leaf, Tree}
 
 package object catsHomework {
@@ -21,11 +20,11 @@ package object catsHomework {
     override def map[B](f: A => B): Tree[B] = Leaf(f(value))
   }
 
-  final case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A] {
+  final case class Branch[A](value: A, left: Tree[A], right: Tree[A]) extends Tree[A] {
     override def isEmpty: Boolean = false
 
     override def map[B](f: A => B): Tree[B] =
-      Branch(left.map(f), right.map(f))
+      Branch(f(value), left.map(f), right.map(f))
   }
 
   case object Empty extends Tree[Nothing] {
@@ -39,9 +38,55 @@ package object catsHomework {
 
     def leaf[A](value: A): Tree[A] = Leaf(value)
 
-    def branch[A](left: Tree[A], right: Tree[A]): Tree[A] = Branch(left, right)
+    def branch[A](value: A, left: Tree[A], right: Tree[A]): Tree[A] = Branch(value, left, right)
 
+    def apply[A](a: A): Tree[A] = leaf(a)
+
+    // создание дерева из списка
+    def apply[A](values: List[A]): Tree[A] = {
+      def buildTree(list: List[A]): Tree[A] = list match {
+        case Nil => Empty
+        case x :: Nil => Leaf(x)
+        case x :: tail =>
+          val (leftHalf, rightHalf) = tail.splitAt(tail.length / 2)
+          Branch(
+            value = x,
+            left = if (leftHalf.nonEmpty) buildTree(leftHalf) else Empty,
+            right = if (rightHalf.nonEmpty) buildTree(rightHalf) else Empty
+          )
+      }
+      buildTree(values)
+    }
+    
+/*
+    // Определяем тип для given как функцию
+    type TreeShow[A] = Tree[A] => String
+
+    // Добавляем given как функцию
+    given treeShow[A]: TreeShow[A] = (tree: Tree[A]) => {
+      def printTree(t: Tree[A], level: Int = 0, indent: String = "    "): String = t match {
+        case Empty => "Empty"
+        case Leaf(v) => List.fill(level)(indent).mkString + s"Leaf($v)"
+        case Branch(v, l, r) =>
+          val indentation: String = List.fill(level)(indent).mkString
+          val leftStr: String = printTree(l, level + 1, indent)
+          val rightStr: String = printTree(r, level + 1, indent)
+
+          s"${indentation}Branch($v)\n" +
+            leftStr.replaceAll("\n", s"\n$indent") + "   " +
+            rightStr.replaceAll("\n", s"\n$indent$indent")
+      }
+
+      printTree(tree)
+    }
+
+    // Добавляем extension-метод для удобства
+    extension [A](tree: Tree[A]) {
+      def show: String = summon[TreeShow[A]](tree)
+    }
+*/
   }
+
 
   /**
    * Напишите instance Functor для объявленного выше бинарного дерева.
@@ -52,7 +97,7 @@ package object catsHomework {
     def map[A, B](fa: Tree[A])(f: A => B): Tree[B] = fa match {
       case Empty => Empty
       case Leaf(value) => Leaf(f(value))
-      case Branch(left, right) => Branch(left.map(f), right.map(f))
+      case Branch(value, left, right) => Branch(f(value), left.map(f), right.map(f))
     }
   }
 
