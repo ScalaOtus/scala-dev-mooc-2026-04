@@ -1,21 +1,62 @@
 package ru.otus.module2
 
+import cats.Functor
+//import cats.syntax.functor._
+import catsHomework.{Branch, Empty, Leaf, Tree}
+
 package object catsHomework {
 
   /**
    * Простое бинарное дерево
    * @tparam A
    */
-  sealed trait Tree[+A]
-  final case class Branch[A](left: Tree[A], right: Tree[A])
-    extends Tree[A]
-  final case class Leaf[A](value: A) extends Tree[A]
+  sealed trait Tree[+A] {
+    def isEmpty: Boolean
+    def map[B](f: A => B): Tree[B]
+  }
+
+  final case class Leaf[A](value: A) extends Tree[A] {
+    override def isEmpty: Boolean = false
+
+    override def map[B](f: A => B): Tree[B] = Leaf(f(value))
+  }
+
+  final case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A] {
+    override def isEmpty: Boolean = false
+
+    override def map[B](f: A => B): Tree[B] =
+      Branch(left.map(f), right.map(f))
+  }
+
+  case object Empty extends Tree[Nothing] {
+    override def isEmpty: Boolean = true
+
+    override def map[B](f: Nothing => B): Tree[B] = Empty
+  }
+
+  object Tree {
+    def empty[A]: Tree[A] = Empty
+
+    def leaf[A](value: A): Tree[A] = Leaf(value)
+
+    def branch[A](left: Tree[A], right: Tree[A]): Tree[A] = Branch(left, right)
+
+  }
 
   /**
    * Напишите instance Functor для объявленного выше бинарного дерева.
    * Проверьте, что код работает корректно для Branch и Leaf
    */
 
+  object TreeFunctor extends Functor[Tree] {
+    def map[A, B](fa: Tree[A])(f: A => B): Tree[B] = fa match {
+      case Empty => Empty
+      case Leaf(value) => Leaf(f(value))
+      case Branch(left, right) => Branch(left.map(f), right.map(f))
+    }
+  }
+
+  given Functor[Tree] = TreeFunctor
 
 
   /**
