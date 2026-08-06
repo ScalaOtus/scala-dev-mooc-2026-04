@@ -111,6 +111,10 @@ package object catsHomework {
     }
   }
 
+//  Запуск тестов решения по задаче 1:
+//    sbt clean compile
+//    sbt "testOnly ru.otus.module2.FunctorTreeSpec"
+
 
   /**
    * Monad абстракция для последовательной
