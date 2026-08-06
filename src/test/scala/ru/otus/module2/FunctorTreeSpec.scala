@@ -80,10 +80,7 @@ class FunctorTreeSpec extends AnyFlatSpec with Matchers with OptionValues {
     val f = (x: Int) => x * 2
     val g = (y: Int) => y + 1
 
-    val leftSide = simpleTree.map(g compose f)
-    val rightSide = simpleTree.map(f).map(g)
-
-    leftSide shouldBe rightSide
+    simpleTree.map(g compose f) shouldBe simpleTree.map(f).map(g)
   }
 
 }
