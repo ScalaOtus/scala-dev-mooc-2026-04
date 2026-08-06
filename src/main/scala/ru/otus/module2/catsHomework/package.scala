@@ -1,8 +1,5 @@
 package ru.otus.module2
 
-import cats.Functor
-import catsHomework.{Branch, Empty, Leaf, Tree}
-
 package object catsHomework {
 
   /**
@@ -57,9 +54,8 @@ package object catsHomework {
       }
       buildTree(values)
     }
-    
-/*
-    // Определяем тип для given как функцию
+
+/*    // Определяем тип для given как функцию
     type TreeShow[A] = Tree[A] => String
 
     // Добавляем given как функцию
@@ -93,7 +89,13 @@ package object catsHomework {
    * Проверьте, что код работает корректно для Branch и Leaf
    */
 
-  object TreeFunctor extends Functor[Tree] {
+  trait Functor2[F[_]]:
+    def map[A, B](fa: F[A])(f: A => B): F[B]
+
+  given func[R]: Functor2[[A] =>> (R) => A] with
+    def map[A, B](fa: R => A)(f: A => B): R => B = fa andThen f
+
+  object TreeFunctor extends Functor2[Tree] {
     def map[A, B](fa: Tree[A])(f: A => B): Tree[B] = fa match {
       case Empty => Empty
       case Leaf(value) => Leaf(f(value))
@@ -101,7 +103,13 @@ package object catsHomework {
     }
   }
 
-  given Functor[Tree] = TreeFunctor
+  given Functor2[Tree] = TreeFunctor
+
+  object TreeSyntax {
+    extension [A](t: Tree[A])(using F: Functor2[Tree]) {
+      def map[B](f: A => B): Tree[B] = F.map(t)(f)
+    }
+  }
 
 
   /**

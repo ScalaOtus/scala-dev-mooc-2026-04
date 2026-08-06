@@ -1,14 +1,13 @@
 package ru.otus.module2
 
-import cats.Functor
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.OptionValues
-import ru.otus.module2.catsHomework.{Branch, Empty, Leaf, Tree, given}
+import ru.otus.module2.catsHomework.{Branch, Empty, Leaf, Tree, Functor2, given}
 
 class FunctorTreeSpec extends AnyFlatSpec with Matchers with OptionValues {
 
-  private val functor = summon[Functor[Tree]]
+  private val functor = summon[Functor2[Tree]]
   private val emptyTree: Tree[Int] = Tree.empty
   private val singleLeaf: Tree[Int] = Tree.leaf(1)
   private val simpleTree: Tree[Int] = Tree(List(1, 2, 3, 4))
@@ -39,7 +38,7 @@ class FunctorTreeSpec extends AnyFlatSpec with Matchers with OptionValues {
     result shouldBe Branch(2, Leaf(4), Branch(6, Empty, Leaf(8)))
   }
 
-  "map function" should "handle String type" in {
+  it should "handle String type" in {
     val stringTree =
       Branch("a",
         Leaf("b"), Leaf("c"))
@@ -56,20 +55,33 @@ class FunctorTreeSpec extends AnyFlatSpec with Matchers with OptionValues {
 
   // Тесты законов функтора
 
-  "Functor laws" should "satisfy identity law" in {
-    // Закон идентичности: fu.map(fa)(identity) == fa
+  "Functor laws on Functor[Tree]" should "satisfy identity law" in {
+    // Закон идентичности: fa.map(a => a) <=> fa
     functor.map(simpleTree)(identity) shouldBe simpleTree
     functor.map(singleLeaf)(identity) shouldBe singleLeaf
     functor.map(emptyTree)(identity) shouldBe emptyTree
   }
 
   it should "satisfy composition law" in {
-    // Закон композиции: fu.map(fu.map(fa)(f))(g) == fu.map(fa)(f andThen g)
+    // Закон композиции: fa.map(g(f(_))) <=> fa.map(f).map(g)
+    //           fu.map(fa)(f andThen g) <=> fu.map(fu.map(fa)(f))(g)
     val f = (x: Int) => x * 2
     val g = (y: Int) => y + 1
 
-    val leftSide = functor.map(functor.map(simpleTree)(f))(g)
-    val rightSide = functor.map(simpleTree)(f andThen g)
+    val leftSide = functor.map(simpleTree)(f andThen g)
+    val mapF = functor.map(simpleTree)(f)
+    val rightSide = functor.map(mapF)(g)
+
+    leftSide shouldBe rightSide
+  }
+
+  it should "satisfy composition law (better syntax)" in {
+    // Закон композиции: fa.map(g(f(_))) <=> fa.map(f).map(g)
+    val f = (x: Int) => x * 2
+    val g = (y: Int) => y + 1
+
+    val leftSide = simpleTree.map(f andThen g)
+    val rightSide = simpleTree.map(f).map(g)
 
     leftSide shouldBe rightSide
   }
