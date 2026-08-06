@@ -85,7 +85,7 @@ package object catsHomework {
 
 
   /**
-   * Напишите instance Functor для объявленного выше бинарного дерева.
+   * 1. Напишите instance Functor для объявленного выше бинарного дерева.
    * Проверьте, что код работает корректно для Branch и Leaf
    */
 
@@ -95,16 +95,30 @@ package object catsHomework {
   given func[R]: Functor2[[A] =>> (R) => A] with
     def map[A, B](fa: R => A)(f: A => B): R => B = fa andThen f
 
-  object TreeFunctor extends Functor2[Tree] {
+//  object TreeFunctor extends Functor2[Tree] {
+//    def map[A, B](fa: Tree[A])(f: A => B): Tree[B] = fa match {
+//      case Empty => Empty
+//      case Leaf(value) => Leaf(f(value))
+//      case Branch(value, left, right) => Branch(f(value), left.map(f), right.map(f))
+//    }
+//  }
+//
+//  given Functor2[Tree] = TreeFunctor
+  
+  // Functor для Tree
+  given treeFunctor: Functor2[Tree] with {
     def map[A, B](fa: Tree[A])(f: A => B): Tree[B] = fa match {
       case Empty => Empty
       case Leaf(value) => Leaf(f(value))
-      case Branch(value, left, right) => Branch(f(value), left.map(f), right.map(f))
+      case Branch(value, left, right) =>
+        Branch(f(value), left.map(f), right.map(f))
     }
   }
-
-  given Functor2[Tree] = TreeFunctor
-
+  
+//  given Functor2[Tree] with {
+//    def map[A, B](fa: List[A])(f: A => B): List[B] = fa.map(f)
+//  }
+  
   object TreeSyntax {
     extension [A](t: Tree[A])(using F: Functor2[Tree]) {
       def map[B](f: A => B): Tree[B] = F.map(t)(f)

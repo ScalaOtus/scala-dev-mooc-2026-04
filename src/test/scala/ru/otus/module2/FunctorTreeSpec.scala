@@ -3,11 +3,10 @@ package ru.otus.module2
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.OptionValues
-import ru.otus.module2.catsHomework.{Branch, Empty, Leaf, Tree, Functor2, given}
+import ru.otus.module2.catsHomework.{Branch, Empty, Leaf, Tree, given}
 
 class FunctorTreeSpec extends AnyFlatSpec with Matchers with OptionValues {
 
-  private val functor = summon[Functor2[Tree]]
   private val emptyTree: Tree[Int] = Tree.empty
   private val singleLeaf: Tree[Int] = Tree.leaf(1)
   private val simpleTree: Tree[Int] = Tree(List(1, 2, 3, 4))
@@ -15,26 +14,22 @@ class FunctorTreeSpec extends AnyFlatSpec with Matchers with OptionValues {
   // Leaf(2)    Branch(3)
   //          Empty     Leaf(4)
 
-  "Functor[Tree] instance" should "be the same instance as TreeFunctor" in {
-    functor shouldBe ru.otus.module2.catsHomework.TreeFunctor
-  }
-
   "Functor[Tree] instance" should "exist and work correctly" in {
-    functor shouldNot be(null)
+    treeFunctor shouldNot be(null)
   }
 
   "Functor[Tree] map function" should "work correctly with empty tree" in {
-    val result = functor.map(emptyTree)(_ * 2)
+    val result = treeFunctor.map(emptyTree)(_ * 2)
     result shouldBe emptyTree
   }
 
   it should "correctly transform single leaf" in {
-    val result = functor.map(singleLeaf)(_ * 2)
+    val result = treeFunctor.map(singleLeaf)(_ * 2)
     result shouldBe Tree.leaf(2)
   }
 
   it should "correctly transform tree" in {
-    val result = functor.map(simpleTree)(_ * 2)
+    val result = treeFunctor.map(simpleTree)(_ * 2)
     result shouldBe Branch(2, Leaf(4), Branch(6, Empty, Leaf(8)))
   }
 
@@ -42,14 +37,14 @@ class FunctorTreeSpec extends AnyFlatSpec with Matchers with OptionValues {
     val stringTree =
       Branch("a",
         Leaf("b"), Leaf("c"))
-    val result = functor.map(stringTree)(_.toUpperCase)
+    val result = treeFunctor.map(stringTree)(_.toUpperCase)
     result shouldBe
       Branch("A",
         Leaf("B"), Leaf("C"))
   }
 
   it should "correctly handle complex transformations" in {
-    val result = functor.map(simpleTree)(x => (x * 2).toString + "x")
+    val result = treeFunctor.map(simpleTree)(x => (x * 2).toString + "x")
     result shouldBe Branch("2x", Leaf("4x"), Branch("6x", Empty, Leaf("8x")))
   }
 
@@ -57,9 +52,9 @@ class FunctorTreeSpec extends AnyFlatSpec with Matchers with OptionValues {
 
   "Functor laws on Functor[Tree]" should "satisfy identity law" in {
     // Закон идентичности: fa.map(a => a) <=> fa
-    functor.map(simpleTree)(identity) shouldBe simpleTree
-    functor.map(singleLeaf)(identity) shouldBe singleLeaf
-    functor.map(emptyTree)(identity) shouldBe emptyTree
+    treeFunctor.map(simpleTree)(identity) shouldBe simpleTree
+    treeFunctor.map(singleLeaf)(identity) shouldBe singleLeaf
+    treeFunctor.map(emptyTree)(identity) shouldBe emptyTree
   }
 
   it should "satisfy composition law" in {
@@ -68,9 +63,9 @@ class FunctorTreeSpec extends AnyFlatSpec with Matchers with OptionValues {
     val f = (x: Int) => x * 2
     val g = (y: Int) => y + 1
 
-    val leftSide = functor.map(simpleTree)(f andThen g)
-    val mapF = functor.map(simpleTree)(f)
-    val rightSide = functor.map(mapF)(g)
+    val leftSide = treeFunctor.map(simpleTree)(f andThen g)
+    val mapF = treeFunctor.map(simpleTree)(f)
+    val rightSide = treeFunctor.map(mapF)(g)
 
     leftSide shouldBe rightSide
   }
