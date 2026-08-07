@@ -155,9 +155,40 @@ package object catsHomework {
   /**
    * 2.1 Напишите instance MonadError для Try
    */
-//  given tryMonadError: MonadError[Try, E] with {
-//    ???
-//  }
+
+  import scala.util.{Try, Success, Failure}
+
+  type TryStr[A] = Try[A]   // ошибка в Throwable
+
+  object TryMonadError extends MonadError[TryStr, Throwable] {
+    // поднимает чистое значение A в контекст Try как успешный результат
+    override def pure[A](a: A): TryStr[A] = Success(a)
+
+    // строит последовательность шагов, где каждый шаг может упасть;
+    // если fa - Success, применяет f; если fa - Failure, сразу возвращает ошибку
+    override def flatMap[A, B](fa: TryStr[A])(f: A => TryStr[B]): TryStr[B] =
+      fa.flatMap(f)
+
+    // способ сообщить об ошибке внутри монадической цепочки
+    override def raiseError[A](e: Throwable): TryStr[A] = Failure(e)
+
+    // способ поймать и обработать ошибку, где обработчик тоже может упасть
+    override def handleErrorWith[A](fa: TryStr[A])(f: Throwable => TryStr[A]): TryStr[A] =
+      fa match {
+        case Success(_) => fa
+        case Failure(err) => f(err)
+      }
+
+    // восстанавливает ошибку до значения (A), предполагает, что восстановление всегда успешно
+    override def handleError[A](fa: TryStr[A])(f: Throwable => A): TryStr[A] =
+      handleErrorWith(fa)(err => pure(f(err)))
+
+    // монадическая валидация: допустимо ли это значение в данном контексте (проверяет значение предикатом p)
+    override def ensure[A](fa: TryStr[A])(e: Throwable)(p: A => Boolean): TryStr[A] =
+      flatMap(fa) { a =>
+        if (p(a)) pure(a) else raiseError(e)
+      }
+  }
 
   /**
    * 2.2 Напишите instance MonadError для Either,
