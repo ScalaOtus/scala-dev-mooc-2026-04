@@ -54,8 +54,6 @@ package object catsHomework {
       }
       buildTree(values)
     }
-
-
   }
 
 
@@ -85,10 +83,6 @@ package object catsHomework {
       def map[B](f: A => B): Tree[B] = F.map(t)(f)
     }
   }
-
-  // Запуск тестов по решению задачи 1:
-  // sbt clean compile
-  // sbt Test/clean "testOnly ru.otus.module2.FunctorTreeSpec"
 
 
   /**
@@ -126,6 +120,7 @@ package object catsHomework {
     // Test an instance of `F`, failing if the predicate is not satisfied:
     def ensure[A](fa: F[A])(e: E)(f: A => Boolean): F[A]
   }
+
 
   /**
    * 2.1 Напишите instance MonadError для Try
@@ -165,10 +160,6 @@ package object catsHomework {
       }
   }
 
-  // Запуск тестов по решению задачи 2.1:
-  // sbt clean compile
-  // sbt Test / clean "testOnly ru.otus.module2.TryMonadErrorSpec"
-
 
   /**
    * 2.2 Напишите instance MonadError для Either,
@@ -201,8 +192,7 @@ package object catsHomework {
   }
 
   // Запуск тестов по всем решениям:
-  //   sbt clean compile
-  //   sbt Test / clean "testOnly ru.otus.module2.*"
-
+  // sbt clean Test/clean compile
+  // sbt "testOnly ru.otus.module2.catsHomework.*"
 
 }
