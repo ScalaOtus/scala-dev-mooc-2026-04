@@ -55,32 +55,7 @@ package object catsHomework {
       buildTree(values)
     }
 
-/*    // Определяем тип для given как функцию
-    type TreeShow[A] = Tree[A] => String
 
-    // Добавляем given как функцию
-    given treeShow[A]: TreeShow[A] = (tree: Tree[A]) => {
-      def printTree(t: Tree[A], level: Int = 0, indent: String = "    "): String = t match {
-        case Empty => "Empty"
-        case Leaf(v) => List.fill(level)(indent).mkString + s"Leaf($v)"
-        case Branch(v, l, r) =>
-          val indentation: String = List.fill(level)(indent).mkString
-          val leftStr: String = printTree(l, level + 1, indent)
-          val rightStr: String = printTree(r, level + 1, indent)
-
-          s"${indentation}Branch($v)\n" +
-            leftStr.replaceAll("\n", s"\n$indent") + "   " +
-            rightStr.replaceAll("\n", s"\n$indent$indent")
-      }
-
-      printTree(tree)
-    }
-
-    // Добавляем extension-метод для удобства
-    extension [A](tree: Tree[A]) {
-      def show: String = summon[TreeShow[A]](tree)
-    }
-*/
   }
 
 
@@ -111,9 +86,9 @@ package object catsHomework {
     }
   }
 
-//  Запуск тестов решения по задаче 1:
-//    sbt clean compile
-//    sbt "testOnly ru.otus.module2.FunctorTreeSpec"
+  // Запуск тестов по решению задачи 1:
+  // sbt clean compile
+  // sbt Test/clean "testOnly ru.otus.module2.FunctorTreeSpec"
 
 
   /**
@@ -190,6 +165,11 @@ package object catsHomework {
       }
   }
 
+  // Запуск тестов по решению задачи 2.1:
+  // sbt clean compile
+  // sbt Test / clean "testOnly ru.otus.module2.TryMonadErrorSpec"
+
+
   /**
    * 2.2 Напишите instance MonadError для Either,
    * где в качестве типа ошибки будет String
@@ -219,5 +199,10 @@ package object catsHomework {
         if (p(a)) pure(a) else raiseError(e)
       }
   }
+
+  // Запуск тестов по всем решениям:
+  //   sbt clean compile
+  //   sbt Test / clean "testOnly ru.otus.module2.*"
+
 
 }

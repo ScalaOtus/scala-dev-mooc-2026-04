@@ -1,4 +1,4 @@
-package ru.otus.module2
+package ru.otus.module2.catsHomework
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
@@ -6,8 +6,9 @@ import org.scalatest.matchers.should.Matchers
 
 class TryMonadErrorSpec extends AnyFlatSpec with Matchers {
 
-  import scala.util.{Try, Success, Failure}
   import ru.otus.module2.catsHomework.{TryMonadError, TryStr}
+
+  import scala.util.{Failure, Success, Try}
 
   "pure" should "wrap a value in Success" in {
     val result = TryMonadError.pure(42)

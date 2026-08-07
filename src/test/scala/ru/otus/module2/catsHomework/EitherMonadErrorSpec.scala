@@ -1,8 +1,8 @@
-package ru.otus.module2
+package ru.otus.module2.catsHomework
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import ru.otus.module2.catsHomework.{EitherStr, EitherMonadError}
+import ru.otus.module2.catsHomework.{EitherMonadError, EitherStr}
 
 class EitherMonadErrorSpec extends AnyFlatSpec with Matchers {
 
