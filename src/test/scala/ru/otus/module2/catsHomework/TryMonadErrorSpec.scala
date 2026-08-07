@@ -3,7 +3,6 @@ package ru.otus.module2.catsHomework
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-
 class TryMonadErrorSpec extends AnyFlatSpec with Matchers {
 
   import ru.otus.module2.catsHomework.{TryMonadError, TryStr}

@@ -2,9 +2,10 @@ package ru.otus.module2.catsHomework
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import ru.otus.module2.catsHomework.{EitherMonadError, EitherStr}
 
 class EitherMonadErrorSpec extends AnyFlatSpec with Matchers {
+
+  import ru.otus.module2.catsHomework.{EitherMonadError, EitherStr}
 
   "pure" should "return Right with the given value" in {
     EitherMonadError.pure(42) shouldBe Right(42)

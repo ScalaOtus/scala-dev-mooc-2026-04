@@ -2,9 +2,10 @@ package ru.otus.module2.catsHomework
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import ru.otus.module2.catsHomework.{Branch, Empty, Leaf, Tree}
 
 class TreeSpec extends AnyFlatSpec with Matchers {
+
+  import ru.otus.module2.catsHomework.{Branch, Empty, Leaf, Tree}
 
   private val emptyTree: Tree[Int] = Tree.empty
   private val singleLeaf: Tree[Int] = Tree.leaf(1)
