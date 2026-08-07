@@ -126,6 +126,11 @@ package object catsHomework {
     def pure[A](v: A): F[A]
   }
 
+  object Monad {
+    extension [F[_], A, B](fa: F[A])(using M: Monad[F]) {
+      def map(f: A => B): F[B] = M.flatMap(fa)(a => M.pure(f(a)))
+    }
+  }
 
   /**
    * MonadError расширяет возможность Monad
@@ -143,22 +148,45 @@ package object catsHomework {
     // Обработка ошибок, восстановление от них:
     def handleError[A](fa: F[A])(f: E => A): F[A]
 
-    // Test an instance of `F`,
-    // failing if the predicate is not satisfied:
+    // Test an instance of `F`, failing if the predicate is not satisfied:
     def ensure[A](fa: F[A])(e: E)(f: A => Boolean): F[A]
   }
 
   /**
-   * Напишите instance MonadError для Try
+   * 2.1 Напишите instance MonadError для Try
    */
-
-
+//  given tryMonadError: MonadError[Try, E] with {
+//    ???
+//  }
 
   /**
-   * Напишите instance MonadError для Either,
+   * 2.2 Напишите instance MonadError для Either,
    * где в качестве типа ошибки будет String
    */
 
+  type EitherStr[A] = Either[String, A]
 
+  object EitherMonadError extends MonadError[EitherStr, String] {
+    override def pure[A](a: A): EitherStr[A] = Right(a)
+
+    override def flatMap[A, B](fa: EitherStr[A])(f: A => EitherStr[B]): EitherStr[B] =
+      fa.flatMap(f)
+
+    override def raiseError[A](e: String): EitherStr[A] = Left(e)
+
+    override def handleErrorWith[A](fa: EitherStr[A])(f: String => EitherStr[A]): EitherStr[A] =
+      fa match {
+        case Right(_) => fa
+        case Left(err) => f(err)
+      }
+
+    override def handleError[A](fa: EitherStr[A])(f: String => A): EitherStr[A] =
+      handleErrorWith(fa)(err => pure(f(err)))
+
+    override def ensure[A](fa: EitherStr[A])(e: String)(p: A => Boolean): EitherStr[A] =
+      flatMap(fa) { a =>
+        if (p(a)) pure(a) else raiseError(e)
+      }
+  }
 
 }
