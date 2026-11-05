@@ -5,11 +5,8 @@ import zio.{Config, ConfigProvider, IO}
 
 
 package object config {
-   case class AppConfig(host: String, port: String)
-
-
-
-
+  case class AppConfig(host: String, port: String)
+  
   private val myConfigAutomatic: Config[AppConfig] = deriveConfig[AppConfig]
 
   object Configuration{

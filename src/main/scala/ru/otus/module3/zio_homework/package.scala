@@ -1,20 +1,62 @@
 package ru.otus.module3
 
+import zio.{Console, IO, Random, Task, UIO, ZIO}
+
+import java.io.IOException
 import scala.language.postfixOps
 
 package object zio_homework {
   /**
    * 1.
-   * Используя сервисы Random и Console, напишите консольную ZIO программу которая будет предлагать пользователю угадать число от 1 до 3
-   * и печатать в консоль угадал или нет. Подумайте, на какие наиболее простые эффекты ее можно декомпозировать.
+   * Используя сервисы Random и Console, напишите консольную ZIO программу, которая будет предлагать пользователю
+   * угадать число от 1 до 3 и печатать в консоль угадал или нет. Подумайте, на какие наиболее простые эффекты ее
+   * можно декомпозировать.
    */
+/*
+  1. Загадать число от 1 до 3 — эффект случайности (Random.nextIntBetween(1, 3)).
+  2. Напечатать приглашение — чистый консольный эффект.
+  3. Прочитать строку и превратить её в число — эффект чтения (Console.readLine) плюс чистый парсинг, который может упасть, поэтому оборачиваем в ZIO.attempt.
+  4. Напечатать результат угадывания — чистое сравнение (==), обёрнутое в эффект печати.
+*/
+  // Эффект: загадываем число от 1 до 3
+  // UIO[Int] - эффект, который гарантированно не падает
+  val secret: UIO[Int] = Random.nextIntBetween(1, 3)
 
+  // Эффект для вывода приглашения
+  val ask: IO[IOException, Unit] = {
+    Console.printLine("Попробуйте угадать число от 1 до 3.\nВедите число:")
+  }
 
+  // Эффект для ввода строки и конвертирования её в Int.
+  // Возможные исключения: IOException, NumberFormatException (это подтипы Throwable).
+  // Итоговый тип: IO[Throwable, Int], он же Task[Int]
+  val inputGuess: Task[Int] = {
+    Console.readLine.flatMap { line =>
+      ZIO.attempt(line.trim.toInt)
+    }
+  }
 
-  lazy val guessProgram = ???
+  // Чистая логика и эффект печати результата.
+  def report(guess: Int, secretNumber: Int): IO[IOException, Unit] = {
+    if (guess == secretNumber)
+      Console.printLine(s"Угадал!")
+    else
+      Console.printLine(s"Не угадал: я загадал число $secretNumber")
+  }
+
+  // объединив Nothing (от secret), IOException (от консоли) и Throwable (от парсинга).
+  lazy val guessProgram: Task[Boolean] =
+    for {
+      hidden <- secret
+      _ <- ask
+      guess <- inputGuess
+      _ <- report(guess, hidden)
+      result = (guess == hidden)   // чистое вычисление, из for разворачивается через .map
+    } yield (result)
 
   /**
-   * 2. реализовать функцию doWhile (общего назначения), которая будет выполнять эффект до тех пор, пока его значение в условии не даст true
+   * 2. реализовать функцию doWhile (общего назначения), которая будет выполнять эффект до тех пор,
+   *    пока его значение в условии не даст true
    * 
    */
 
