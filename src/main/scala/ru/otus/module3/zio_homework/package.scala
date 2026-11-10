@@ -4,6 +4,7 @@ import zio.{Console, IO, Random, Task, UIO, ZIO}
 
 import java.io.IOException
 import scala.language.postfixOps
+import zio_homework.config.Configuration
 
 package object zio_homework {
   /**
@@ -18,14 +19,6 @@ package object zio_homework {
   3. Прочитать строку и превратить её в число — эффект чтения (Console.readLine) плюс чистый парсинг, который может упасть, поэтому оборачиваем в ZIO.attempt.
   4. Напечатать результат угадывания — чистое сравнение (==), обёрнутое в эффект печати.
 */
-  // Эффект: загадываем число от 1 до 3
-  // UIO[Int] - эффект, который гарантированно не падает
-  val secret: UIO[Int] = Random.nextIntBetween(1, 3)
-
-  // Эффект для вывода приглашения
-  val ask: IO[IOException, Unit] = {
-    Console.printLine("Попробуйте угадать число от 1 до 3.\nВедите число:")
-  }
 
   // Эффект для ввода строки и конвертирования её в Int.
   // Возможные исключения: IOException, NumberFormatException (это подтипы Throwable).
@@ -47,11 +40,11 @@ package object zio_homework {
   // объединив Nothing (от secret), IOException (от консоли) и Throwable (от парсинга).
   lazy val guessProgram: Task[Boolean] =
     for {
-      hidden <- secret
-      _ <- ask
+      hidden <- Random.nextIntBetween(1, 3)
+      _ <- Console.printLine("Попробуйте угадать число от 1 до 3.\nВедите число:")
       guess <- inputGuess
       _ <- report(guess, hidden)
-      result = (guess == hidden)   // чистое вычисление, из for разворачивается через .map
+      result = (guess == hidden)   // можно, потому что это чистое вычисление, которое из for разворачивается через .map()
     } yield (result)
 
   /**
@@ -59,18 +52,56 @@ package object zio_homework {
    *    пока его значение в условии не даст true
    * 
    */
-
-  def doWhile = ???
+  /**
+   Из условий задачи следует:
+   1) На входе даны
+      - эффект в общем виде: effect: ZIO[R, E, A]
+      - условие: cond: A => Boolean
+   2) doWhile повторяет effect, пока cond(a) возвращает false. Останавливается при первом результате cond(a) == true.
+   3) Значение результата не требуется, поэтому на выходе ZIO[R, E, Unit].
+   Получается сигнатура
+      def doWhile[R, E, A](effect: ZIO[R, E, A])(cond: A => Boolean): ZIO[R, E, Unit]
+   Делаю функцию каррированной для удобства использования (сначала эффект, потом условие).
+   Поскольку guessProgram (задача 1) у меня возвращает эффект с результатом Task[Boolean], то удобно его использовать
+   для запуска doWhile:
+      doWhile(guessProgram)(result => result)
+   Тогда игра guessProgram будет повторяться до выигрыша-угадывания (result == true) (или прекратиться при ошибке).
+  */
+  def doWhile[R, E, A](effect: ZIO[R, E, A])(cond: A => Boolean): ZIO[R, E, Unit] = {
+    effect.flatMap { a =>
+      if (cond(a)) ZIO.succeed(())
+      else doWhile(effect)(cond)
+    }
+  }
+  /* альтернатива (Scala 3)
+  for
+    a <- effect
+    _ <- if cond(a)
+      then ZIO.unit
+      else doWhile(effect)(cond)
+  yield ()
+  */
 
   /**
-   * 3. Реализовать метод, который безопасно прочитает конфиг из переменных окружения, а в случае ошибки вернет дефолтный конфиг
-   * и выведет его в консоль
+   * 3. Реализовать метод, который безопасно прочитает конфиг из переменных окружения, а в случае ошибки вернет
+   *    дефолтный конфиг и выведет его в консоль.
    * Используйте эффект "Configuration.config" из пакета config
    */
+  def loadConfigOrDefault: UIO[config.AppConfig] =
+    Configuration.config.catchAll { error =>
+      Console
+        .printLine(s"Ошибка чтения конфига:\n$error\n")
+        .ignore *>    // UIO[Unit]
+        Console
+          .printLine(s"Использую дефолтный конфиг: host = ${Configuration.defaultConfig.host}, port = ${Configuration.defaultConfig.port}\n")
+          .ignore *>
+          ZIO.succeed(Configuration.defaultConfig)
+    }
+  // запуск с ошибкой и её обработкой
+  // sbt "runMain ru.otus.module3.zio_homework.ZioHomeWorkApp"
 
-
-  def loadConfigOrDefault = ???
-
+  // запуск без ошибки
+  // HOST=localhost PORT=8080 sbt "runMain ru.otus.module3.zio_homework.ZioHomeWorkApp"
 
   /**
    * 4. Следуйте инструкциям ниже для написания 2-х ZIO программ,
