@@ -5,7 +5,7 @@ package ru.otus.module3
 //import ru.otus.module3.ResourceApp.validateEnv
 //import zioConcurrency.printEffectRunningTime
 import ru.otus.module3.BuildingZIOServices.validateEnv
-import zio.{Clock, Console, IO, Random, Task, UIO, ZIO, ZLayer, durationInt}
+import zio.{Clock, Console, IO, Random, Task, UIO, ULayer, ZIO, ZLayer, durationInt}
 
 import java.io.IOException
 import scala.language.postfixOps
@@ -89,11 +89,11 @@ package object zio_homework {
   */
 
   /**
-   * 3. Реализовать метод, который безопасно прочитает конфиг из переменных окружения, а в случае ошибки вернет
-   *    дефолтный конфиг и выведет его в консоль.
-   * Используйте эффект "Configuration.config" из пакета config
+   * 3. Реализовать метод, который безопасно прочитает конфиг из переменных окружения,
+   *    а в случае ошибки вернет дефолтный конфиг и выведет его в консоль.
+   *    Используйте эффект "Configuration.config" из пакета config.
    */
-  def loadConfigOrDefault: UIO[config.AppConfig] =
+  /*def loadConfigOrDefault: UIO[config.AppConfig] =
     Configuration.config.catchAll { error =>
       Console
         .printLine(s"Ошибка чтения конфига:\n$error\n")
@@ -102,8 +102,40 @@ package object zio_homework {
           .printLine(s"Использую дефолтный конфиг: host = ${Configuration.defaultConfig.host}, port = ${Configuration.defaultConfig.port}\n")
           .ignore *>
           ZIO.succeed(Configuration.defaultConfig)
-    }
+    }*/
+  def loadConfigOrDefault: UIO[config.AppConfig] =
+    Configuration.config.foldZIO(
+      failure = error => {
+        val default = Configuration.defaultConfig
+        Console
+          .printLine(s"Ошибка чтения конфига из переменных окружения:\n$error\n")
+          .ignore *>    // UIO[Unit]
+          Console
+            .printLine(s"Подключаюсь с параметрами по умолчанию: host = ${default.host}, port = ${default.port}\n")
+            .ignore *>
+          ZIO.succeed(default)
+      },
+      success = cfg =>
+        Console
+          .printLine(s"Подключаюсь по заданными параметрам к ${cfg.host}:${cfg.port}")
+          .ignore *>
+          ZIO.succeed(cfg)
+    )
 
+//    loadConfigOrDefault.flatMap { cfg =>
+//      Console.printLine(s"Подключаюсь к ${cfg.host}:${cfg.port}")
+//    }
+/*
+val loadConfigOrDefault: ZIO[Any, String, Config] =
+  readConfig.foldM(
+    failure = e =>
+      Console.printLine(s"Не удалось прочитать файл: $e")
+        .as(Config.default),                    // фолбэк на дефолт
+    success = raw =>
+      ZIO.fromEither(parse(raw))               // успех тоже может провалиться
+        .mapError(msg => s"Некорректный конфиг: $msg")
+  )
+*/
 
   /**
    * 4. Следуйте инструкциям ниже для написания 2-х ZIO программ,
@@ -171,39 +203,34 @@ package object zio_homework {
    * 5. Оформите ф-цию printEffectRunningTime, разработанную на занятиях, в отдельный сервис, так чтобы ее
    * можно было использовать аналогично zio.Console.printLine, например
    */
-  // Трейт — контракт сервиса. Он описывает ЧТО умеет сервис, а не КАК это делается.
-  trait Timing {
+  
+  trait TimingService {
     def printEffectRunningTime[R, E, A](zio: ZIO[R, E, A]): ZIO[R, E, A]
   }
 
-  // Реализация — слой live
-  object Timing {
-    val live: ZLayer[Any, Nothing, Timing] =
-      ZLayer.succeed {
-        // Создание анонимного класса, реализующего трейт (т.е. его метод), реализация взята из пакета zioConcurrency
-        new Timing {
-          def printEffectRunningTime[R, E, A](zio: ZIO[R, E, A]): ZIO[R, E, A] =
-            for {
-              start <- Clock.currentTime(TimeUnit.MILLISECONDS)
-              r <- zio
-              end <- Clock.currentTime(TimeUnit.MILLISECONDS)
-              _ <- Console.printLine(s"Running time: ${end - start} ms").orDie
-            } yield r
-        }
-      }
+  object TimingService {
+    val live: ULayer[TimingService] =
+      ZLayer.succeed[TimingService](new TimingService {
+        override def printEffectRunningTime[R, E, A](zio: ZIO[R, E, A]): ZIO[R, E, A] =
+          for {
+            start <- Clock.currentTime(TimeUnit.MILLISECONDS)
+            r <- zio
+            end <- Clock.currentTime(TimeUnit.MILLISECONDS)
+            _ <- Console.printLine(s"Running time: ${end - start} ms").catchAllCause(_ => ZIO.unit)
+          } yield r
+      })
 
     // Акцессор: достаёт реализацию из окружения и дергает её метод
-    def printEffectRunningTime[R, E, A](zio: ZIO[R, E, A]): ZIO[R with Timing, E, A] =
-      ZIO.serviceWithZIO[Timing](_.printEffectRunningTime(zio))
-
+    def printEffectRunningTime[R, E, A](zio: ZIO[R, E, A]): ZIO[R & TimingService, E, A] =
+      ZIO.serviceWithZIO[TimingService](_.printEffectRunningTime(zio))
   }
 
-  lazy val app5: ZIO[Timing, IOException, Unit] =
+  lazy val app5: ZIO[TimingService, IOException, Unit] =
     for {
       _ <- Console.printLine("Последовательное исполнение...")
-      _ <- Timing.printEffectRunningTime(sumSequential.unit) // ~10 секунд
+      _ <- TimingService.printEffectRunningTime(sumSequential.unit) // ~10 секунд
       _ <- Console.printLine("\nПараллельное исполнение...")
-      _ <- Timing.printEffectRunningTime(sumParallel.unit)    // ~1 секунда
+      _ <- TimingService.printEffectRunningTime(sumParallel.unit)    // ~1 секунда
     } yield ()
 
 
@@ -214,13 +241,17 @@ package object zio_homework {
      * 
      */
 
-  lazy val appWithTimeLogg = ???
-
+  lazy val appWithTimeLogg: ZIO[TimingService, IOException, Unit] =
+    for {
+      _ <- Console.printLine("Задача 6. Последовательное исполнение...")
+      _ <- TimingService.printEffectRunningTime(sumSequential.unit)
+    } yield ()
   /**
     * 
     * Подготовьте его к запуску и затем запустите воспользовавшись ZioHomeWorkApp
     */
 
-  lazy val runApp = ???
+  lazy val runApp: ZIO[Any, IOException, Unit] =
+    appWithTimeLogg.provide(TimingService.live)
 
 }
