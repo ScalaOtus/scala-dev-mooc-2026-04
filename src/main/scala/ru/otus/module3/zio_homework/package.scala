@@ -1,16 +1,12 @@
 //noinspection ScalaWeakerAccess
 package ru.otus.module3
 
-//import ru.otus.module3.BuildingZIOServices.validateEnv
-//import ru.otus.module3.ResourceApp.validateEnv
-//import zioConcurrency.printEffectRunningTime
-import ru.otus.module3.BuildingZIOServices.validateEnv
 import zio.{Clock, Console, IO, Random, Task, UIO, ULayer, ZIO, ZLayer, durationInt}
 
 import java.io.IOException
 import scala.language.postfixOps
 import zio_homework.config.Configuration
-
+ 
 import java.util.concurrent.TimeUnit
 
 package object zio_homework {
