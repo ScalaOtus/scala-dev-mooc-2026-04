@@ -1,12 +1,13 @@
 //noinspection ScalaWeakerAccess
 package ru.otus.module3
 
+import ru.otus.module3.zio_homework.TimingService
 import zio.{Clock, Console, IO, Random, Task, UIO, ULayer, ZIO, ZLayer, durationInt}
 
 import java.io.IOException
 import scala.language.postfixOps
 import zio_homework.config.Configuration
- 
+
 import java.util.concurrent.TimeUnit
 
 package object zio_homework {
@@ -36,7 +37,7 @@ package object zio_homework {
 
   lazy val guessProgram: Task[Boolean] =
     for {
-      hidden <- Random.nextIntBetween(1, 3)
+      hidden <- Random.nextIntBetween(1, 4)
       _ <- Console.printLine("Попробуйте угадать число от 1 до 3.\nВедите число:")
       guess <- inputGuess
       _ <- report(guess, hidden)
@@ -119,7 +120,7 @@ package object zio_homework {
   lazy val eff: UIO[Int] =
     for {
       _ <- ZIO.sleep(1 seconds)   // UIO[Int]
-      random <- Random.nextIntBetween(0, 10)  // UIO[Int]
+      random <- Random.nextIntBetween(0, 11)  // UIO[Int]
     } yield random
 
   /**
@@ -183,10 +184,13 @@ package object zio_homework {
         override def printEffectRunningTime[R, E, A](zio: ZIO[R, E, A]): ZIO[R, E, A] =
           for {
             start <- Clock.currentTime(TimeUnit.MILLISECONDS)
-            r <- zio
-            end <- Clock.currentTime(TimeUnit.MILLISECONDS)
-            _ <- Console.printLine(s"Running time: ${end - start} ms").catchAllCause(_ => ZIO.unit)
-          } yield r
+            res <- zio.ensuring(
+              for {
+                end <- Clock.currentTime(TimeUnit.MILLISECONDS)
+                _ <- Console.printLine(s"Running time: ${end - start} ms").ignore
+              } yield ()
+            )
+          } yield res
       })
 
     // Акцессор: достаёт реализацию из окружения и дергает её метод
