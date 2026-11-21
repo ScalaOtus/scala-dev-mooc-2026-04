@@ -20,12 +20,6 @@ package object zio_homework {
    * угадать число от 1 до 3 и печатать в консоль угадал или нет. Подумайте, на какие наиболее простые эффекты ее
    * можно декомпозировать.
    */
-/*
-  1. Загадать число от 1 до 3 — эффект случайности (Random.nextIntBetween(1, 3)).
-  2. Напечатать приглашение — чистый консольный эффект.
-  3. Прочитать строку и превратить её в число — эффект чтения (Console.readLine) плюс чистый парсинг, который может упасть, поэтому оборачиваем в ZIO.attempt.
-  4. Напечатать результат угадывания — чистое сравнение (==), обёрнутое в эффект печати.
-*/
 
   // Эффект для ввода строки и конвертирования её в Int.
   // Возможные исключения: IOException, NumberFormatException (это подтипы Throwable).
@@ -50,9 +44,10 @@ package object zio_homework {
       _ <- Console.printLine("Попробуйте угадать число от 1 до 3.\nВедите число:")
       guess <- inputGuess
       _ <- report(guess, hidden)
-      result = (guess == hidden)   // можно, потому что это чистое вычисление, которое из for разворачивается через .map()
+      result = (guess == hidden)   // чистое вычисление, разворачивается из for как .map()
     } yield result
 
+  
   /**
    * 2. реализовать функцию doWhile (общего назначения), которая будет выполнять эффект до тех пор,
    *    пока его значение в условии не даст true
@@ -79,7 +74,7 @@ package object zio_homework {
       else doWhile(effect)(cond)
     }
   }
-  /* альтернатива (Scala 3)
+  /* альтернатива (Scala 3 и for)
   for {
     a <- effect
     _ <- if cond(a)
@@ -88,21 +83,13 @@ package object zio_homework {
   } yield ()
   */
 
+  
   /**
    * 3. Реализовать метод, который безопасно прочитает конфиг из переменных окружения,
    *    а в случае ошибки вернет дефолтный конфиг и выведет его в консоль.
    *    Используйте эффект "Configuration.config" из пакета config.
    */
-  /*def loadConfigOrDefault: UIO[config.AppConfig] =
-    Configuration.config.catchAll { error =>
-      Console
-        .printLine(s"Ошибка чтения конфига:\n$error\n")
-        .ignore *>    // UIO[Unit]
-        Console
-          .printLine(s"Использую дефолтный конфиг: host = ${Configuration.defaultConfig.host}, port = ${Configuration.defaultConfig.port}\n")
-          .ignore *>
-          ZIO.succeed(Configuration.defaultConfig)
-    }*/
+  
   def loadConfigOrDefault: UIO[config.AppConfig] =
     Configuration.config.foldZIO(
       failure = error => {
@@ -121,21 +108,7 @@ package object zio_homework {
           .ignore *>
           ZIO.succeed(cfg)
     )
-
-//    loadConfigOrDefault.flatMap { cfg =>
-//      Console.printLine(s"Подключаюсь к ${cfg.host}:${cfg.port}")
-//    }
-/*
-val loadConfigOrDefault: ZIO[Any, String, Config] =
-  readConfig.foldM(
-    failure = e =>
-      Console.printLine(s"Не удалось прочитать файл: $e")
-        .as(Config.default),                    // фолбэк на дефолт
-    success = raw =>
-      ZIO.fromEither(parse(raw))               // успех тоже может провалиться
-        .mapError(msg => s"Некорректный конфиг: $msg")
-  )
-*/
+    
 
   /**
    * 4. Следуйте инструкциям ниже для написания 2-х ZIO программ,
