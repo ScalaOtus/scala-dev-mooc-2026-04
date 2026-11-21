@@ -76,11 +76,11 @@ object functional_effects {
 //        println(s"Привет, $name")
 //      }
 
-       val greet: Console[Unit] = for{
-         _ <- Console.printLine("Как тебя зовут?")
-         name <- Console.readLine()
-         _ <- Console.printLine(s"Привет, $name")
-       } yield ()
+      val greet: Console[Unit] = for{
+        _ <- Console.printLine("Как тебя зовут?")
+        name <- Console.readLine()
+        _ <- Console.printLine(s"Привет, $name")
+      } yield ()
 
       val askForAge: Console[Unit] = for{
         _ <- Console.printLine("Сколько тебе лет?")

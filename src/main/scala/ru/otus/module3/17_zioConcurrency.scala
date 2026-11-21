@@ -26,7 +26,7 @@ object zioConcurrency {
   // 3. Получить время
   // 4. Вывести разницу
 
-  def printEffectRunningTime[R, E, A](zio: ZIO[R, E, A]): ZIO[R, E, A] = 
+  def printEffectRunningTime[R, E, A](zio: ZIO[R, E, A]): ZIO[R, E, A] =
     for {
       start <- currentTime
       r <- zio
