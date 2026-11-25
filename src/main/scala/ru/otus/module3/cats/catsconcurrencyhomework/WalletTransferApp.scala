@@ -135,7 +135,7 @@ object WalletTransferApp extends IOApp.Simple {
           IO.println(s"transfer2 $amount ОШИБКА: ${e.getMessage}")
         )
 
-      // ОШИБКА 100,200
+      // 100,200  ОШИБКА: Недостаточно средств
       _ <- testTransfer(transfer2, startB1, startB2, errAmount).flatMap { case (b1, b2) =>
         IO.println(s"transfer2 $amount: $b1,$b2")
       }
