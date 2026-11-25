@@ -14,8 +14,8 @@ object WalletMain extends IOApp.Simple {
       _ <- wallet.balance.flatMap(IO.println)
       _ <- wallet.withdraw(50.0)
       _ <- wallet.balance.flatMap(IO.println)
-      // bad <- wallet.withdraw(500.0)
-      // _   <- IO.println(s"withdraw: $bad")      // Left(BalanceTooLow)
+       bad <- wallet.withdraw(500.0)
+       _   <- IO.println(s"withdraw: $bad")      // Left(BalanceTooLow)
     } yield ()
 
 }
