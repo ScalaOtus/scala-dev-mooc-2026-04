@@ -45,4 +45,6 @@ build/
 
 ### Scala ###
 .bsp/
-project/target
+project/target!/.idea/
+/.idea/
+/.idea/

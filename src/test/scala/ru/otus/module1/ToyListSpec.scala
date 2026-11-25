@@ -1,4 +1,4 @@
-package module1
+package ru.otus.module1
 
 import org.scalatest.flatspec.AnyFlatSpec
 import ru.otus.module1.collections2.{Cons, Nil, ToyList}
