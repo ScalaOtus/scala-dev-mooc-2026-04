@@ -9,13 +9,13 @@ object WalletMain extends IOApp.Simple {
     val walletName = "test_wallet"
     for {
       wallet <- Wallet.fileWallet[IO](walletName)
-      _ <- IO.println(s"Wallet path: ${FileWallet.pathFor(walletName)}")  // для отладки
+//      _ <- IO.println(s"Wallet path: ${FileWallet.pathFor(walletName)}")  // для отладки
       _ <- wallet.topup(100.0)
       _ <- wallet.balance.flatMap(IO.println)
       _ <- wallet.withdraw(50.0)
       _ <- wallet.balance.flatMap(IO.println)
-       bad <- wallet.withdraw(500.0)
-       _   <- IO.println(s"withdraw: $bad")      // Left(BalanceTooLow)
+//       bad <- wallet.withdraw(500.0)
+//       _   <- IO.println(s"withdraw: $bad")      // Left(BalanceTooLow)
     } yield ()
 
 }
