@@ -109,38 +109,38 @@ object WalletTransferApp extends IOApp.Simple {
 
     for {
       // 50,250
-      _ <- testTransfer(transfer, startB1, startB2, 50).flatMap { case (b1, b2) =>
-        assert(b1 == expectedB1 && b2 == expectedB2, s"Тест не пройден! Ожидалось $expectedB1/$expectedB2 — получено $b1/$b2")
-        IO.println(s"transfer $amount: $b1,$b2")
-      }
+      _ <- testTransfer(transfer, startB1, startB2, amount).flatMap { case (b1, b2) =>
+          assert(b1 == expectedB1 && b2 == expectedB2, s"Тест не пройден! Ожидалось $expectedB1/$expectedB2 — получено $b1/$b2")
+          IO.println(s"transfer $amount: $b1,$b2")
+        }
         .handleErrorWith(e =>
           IO.println(s"transfer $amount ОШИБКА: ${e.getMessage}")
         )
 
       // 600/200 (ошибка BalanceTooLow не отлавливается - поэтому сделана transfer2)
       _ <- testTransfer(transfer, startB1, startB2, errAmount).flatMap { case (b1, b2) =>
-        assert(b1 == exp1ErrB1 && b2 == exp1ErrB2, s"Тест не пройден! Ожидалось $exp1ErrB1/$exp1ErrB2 — получено $b1/$b2")
-        IO.println(s"transfer $errAmount: $b1,$b2")
-      }
+          assert(b1 == exp1ErrB1 && b2 == exp1ErrB2, s"Тест не пройден! Ожидалось $exp1ErrB1/$exp1ErrB2 — получено $b1/$b2")
+          IO.println(s"transfer $errAmount: $b1,$b2")
+        }
         .handleErrorWith(e =>
           IO.println(s"transfer $errAmount ОШИБКА: ${e.getMessage}")
         )
 
       // 50,250
       _ <- testTransfer(transfer2, startB1, startB2, amount).flatMap { case (b1, b2) =>
-        assert(b1 == expectedB1 && b2 == expectedB2, s"Тест не пройден! Ожидалось $expectedB1/$expectedB2 — получено $b1/$b2")
-        IO.println(s"transfer2 $amount: $b1,$b2")
-      }
+          assert(b1 == expectedB1 && b2 == expectedB2, s"Тест не пройден! Ожидалось $expectedB1/$expectedB2 — получено $b1/$b2")
+          IO.println(s"transfer2 $amount: $b1,$b2")
+        }
         .handleErrorWith(e =>
           IO.println(s"transfer2 $amount ОШИБКА: ${e.getMessage}")
         )
 
       // 100,200  ОШИБКА: Недостаточно средств
       _ <- testTransfer(transfer2, startB1, startB2, errAmount).flatMap { case (b1, b2) =>
-        IO.println(s"transfer2 $amount: $b1,$b2")
-      }
+          IO.println(s"transfer2 $errAmount: $b1,$b2")
+        }
         .handleErrorWith(e =>
-          IO.println(s"transfer2 500 ОШИБКА: ${e.getMessage}")
+          IO.println(s"transfer2 $errAmount ОШИБКА: ${e.getMessage}")
         )
 
     } yield ()

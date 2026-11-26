@@ -1,7 +1,7 @@
 package ru.otus.module3.cats.catsconcurrencyhomework
 
 
-import cats.effect.Sync
+import cats.effect.{Resource, Sync}
 import cats.implicits.*
 import Wallet.*
 
@@ -37,13 +37,13 @@ final class FileWallet[F[_]: Sync](id: WalletId) extends Wallet[F] {
 
   // метод write для хранения в файле (только для внутреннего использования)
   private def write(value: BigDecimal): F[Unit] =
-    Sync[F].delay(
+    Sync[F].blocking(
       Files.write(file, value.toString.getBytes(StandardCharsets.UTF_8))
-    ).void
+    )
 
   // приватный метод для чтения баланса из файла
   private def read: F[BigDecimal] =
-    Sync[F].delay(Files.readString(file)).map(s => BigDecimal(s.trim))
+    Sync[F].blocking(Files.readString(file)).map(s => BigDecimal(s.trim))
 
   // возвращает текущий баланс
   override def balance: F[BigDecimal] = read
@@ -56,7 +56,7 @@ final class FileWallet[F[_]: Sync](id: WalletId) extends Wallet[F] {
     //   _ <- write(current + amount)
     // yield ()
 
-  // списывает указанную сумму с баланса (ошибка если средств недостаточно)
+  // списывает указанную сумму с баланса (ошибка, если средств недостаточно)
   override def withdraw(amount: BigDecimal): F[Either[WalletError, Unit]] =
     read.flatMap { current =>
       if (current < amount)
@@ -74,13 +74,23 @@ object FileWallet {
 object Wallet {
   // Смарт-конструктор - фабрика для создания готового экземпляра Wallet.
   // Создаёт файл с нулевым балансом (если нужно) и возвращает готовый интерпретатор (работающий со своим файлом).
-  def fileWallet[F[_] : Sync](id: WalletId): F[Wallet[F]] =
-    Sync[F].delay {
+/*  def fileWallet[F[_] : Sync](id: WalletId): F[Wallet[F]] =
+    Sync[F].blocking {
       val initialPath = FileWallet.pathFor(id)
       if (!Files.exists(initialPath))   // Файл с начальным балансом 0 создаётся ровно один раз: когда файла нет
         Files.write(initialPath, BigDecimal(0).toString.getBytes(StandardCharsets.UTF_8))
       new FileWallet[F](id)
-    }
+    }*/
+
+  def fileWallet[F[_] : Sync](id: WalletId): Resource[F, Wallet[F]] =
+    Resource.make(
+      Sync[F].blocking {
+        val initialPath = FileWallet.pathFor(id)
+        if (!Files.exists(initialPath))
+          Files.write(initialPath, BigDecimal(0).toString.getBytes(StandardCharsets.UTF_8))
+        new FileWallet[F](id)
+      }
+    )(_ => Sync[F].blocking(Files.deleteIfExists(FileWallet.pathFor(id))).void)
 
   // внимание на сигнатуру результата - инициализация кошелька имеет сайд-эффекты
   // Здесь нужно использовать обобщенную версию уже пройденного вами метода IO.delay,

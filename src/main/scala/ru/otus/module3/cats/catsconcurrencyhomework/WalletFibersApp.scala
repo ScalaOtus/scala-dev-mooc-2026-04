@@ -1,10 +1,9 @@
 package ru.otus.module3.cats.catsconcurrencyhomework
 
-import cats.Monad
-import cats.effect.{IO, IOApp}
+import cats.effect.{IO, IOApp, Resource}
 import cats.implicits.*
 
-import scala.concurrent.duration.{DurationInt, FiniteDuration}
+import scala.concurrent.duration.{DurationInt, Duration}
 
 // Поиграемся с кошельками на файлах и файберами.
 
@@ -29,7 +28,7 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 object WalletFibersApp extends IOApp.Simple {
 
   // 1) бесконечный процесс регулярного пополнения кошелька на 100р каждые N миллисекунд
-  def topUpLoop(wallet: Wallet[IO], interval: FiniteDuration): IO[Unit] = {
+  def topUpLoop(wallet: Wallet[IO], interval: Duration): IO[Unit] = {
     def loop(): IO[Unit] =
       wallet.topup(100)
         .flatMap(_ => IO.sleep(interval))
@@ -52,38 +51,43 @@ object WalletFibersApp extends IOApp.Simple {
 
     loop()
   }
-  
-  // Сброс кошелька в начальное состояние (0) 
-  private def reset(wallet: Wallet[IO]): IO[Unit] =
-    wallet.balance.flatMap(b => wallet.withdraw(b)).void
+
+  // Сброс кошелька в начальное состояние (0)
+  /*private def reset(wallet: Wallet[IO]): IO[Unit] =
+    wallet.balance.flatMap { b =>
+      if (b == BigDecimal(0)) IO.unit
+      else wallet.withdraw(b).void
+    }*/
 
   def run: IO[Unit] =
-    for {
-      _ <- IO.println("Press Enter to stop...")
+    (for {
+      _ <- Resource.eval(IO.println("Press Enter to stop..."))
+
+      // кошельки приходят как Resource[IO, Wallet[IO]] (поэтому не нужен Resource.eval)
       wallet1 <- Wallet.fileWallet[IO]("1")
       wallet2 <- Wallet.fileWallet[IO]("2")
       wallet3 <- Wallet.fileWallet[IO]("3")
 
-      _ <- IO.println(s"Wallet 1 path: ${FileWallet.pathFor("1")}")
-      _ <- IO.println(s"Wallet 2 path: ${FileWallet.pathFor("2")}")
-      _ <- IO.println(s"Wallet 3 path: ${FileWallet.pathFor("3")}")
+      _ <- Resource.eval(IO.println(s"Wallet 1 path: ${FileWallet.pathFor("1")}"))
+      _ <- Resource.eval(IO.println(s"Wallet 2 path: ${FileWallet.pathFor("2")}"))
+      _ <- Resource.eval(IO.println(s"Wallet 3 path: ${FileWallet.pathFor("3")}"))
 
-      // сброс балансов в ноль перед стартом файберов
-      _  <- List(wallet1, wallet2, wallet3).traverse_(reset)
+      // сброс балансов в ноль перед стартом файберов (уже сброшены из прошлого Resource)
+      // _ <- Resource.eval(List(wallet1, wallet2, wallet3).traverse_(reset))
 
-      // 2) запуск фонового пополнения трёх кошельков через файберы (с заданным периодом)
-      f1 <- topUpLoop(wallet1, 100.millis).start
-      f2 <- topUpLoop(wallet2, 500.millis).start
-      f3 <- topUpLoop(wallet3, 2000.millis).start
+      // фоновые файберы пополнения (старт/отмена файбера автоматически как часть .background)
+      _ <- topUpLoop(wallet1, 100.millis).background
+      _ <- topUpLoop(wallet2, 500.millis).background
+      _ <- topUpLoop(wallet3, 2000.millis).background
 
-      // 4) запуск фонового файбера (п.3) с выводом баланса в терминал
-      f4 <- printLoop(wallet1, wallet2, wallet3).start
+      // фоновый файбер с выводом балансов
+      _ <- printLoop(wallet1, wallet2, wallet3).background
 
-      // 5) в основном файбере, ждём ввода (Enter) пользователя, отменяем/завершаем все фоновые файберы,
-      // и основной файбер (и вся программа) завершается.
-      _  <- IO.readLine
-      _  <- List(f1, f2, f3, f4).traverse_(_.cancel)
-      _  <- IO.println("Stopped.")
+      // ждём Enter — после выхода из use файберы отменятся как Resource через background,
+      // при закрытии/отмене для каждого кошелька release удалит свой файл
+      _ <- Resource.eval(IO.readLine)
     } yield ()
-
+    ).use(
+      _ => IO.println("Stopped.")
+    )
 }
